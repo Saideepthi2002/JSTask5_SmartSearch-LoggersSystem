@@ -17,8 +17,7 @@
       let textarea = document.getElementById("input");
       let finalres_para = document.getElementById("finalresultpara");
       let div = document.getElementById("trotlng_res");
-
-      //   currying function
+      //currying function
       function curryLoggerfun(arg1) {
         return function (arg2) {
           //   console.log(`(${arg1})-${arg2}`);
@@ -79,13 +78,11 @@
           }
         };
       }
-
       // fun used in throttling
       function triggeredkeys() {
-        // console.log("Throttled keystroke:", input.value);
         logger(`Throttled keystroke: ${textarea.value}`);
+        // console.log("Throttled keystroke:", textarea.value);
       }
-
       let throttlingVal = throttling(triggeredkeys, 300);
       textarea.addEventListener("keyup", throttlingVal);
     </script>
