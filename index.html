@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <h2>Smart Search & Logger System</h2>
+    <input type="text" id="input" placeholder="Type here..." />
+    <div id="trotlng_res">
+      <div id="trotlng_res"></div>
+    </div>
+    <p id="finalresultpara"></p>
+
+    <script>
+      let textarea = document.getElementById("input");
+      let finalres_para = document.getElementById("finalresultpara");
+      let div = document.getElementById("trotlng_res");
+
+      //   currying function
+      function curryLoggerfun(arg1) {
+        return function (arg2) {
+          //   console.log(`(${arg1})-${arg2}`);
+          let msg = `(${arg1})-${arg2}`;
+          console.log(msg);
+          //   create p tag
+          const ptag = document.createElement("p");
+          ptag.textContent = msg;
+          div.appendChild(ptag);
+        };
+      }
+
+      let logger = curryLoggerfun("INFO");
+      // Debounce fun
+      function debounce(myfun, delayTime) {
+        let timeout;
+        return function () {
+          clearTimeout(timeout);
+          timeout = setTimeout(myfun, delayTime);
+        };
+      }
+      // fun used in debounce
+      async function fetchData() {
+        let response = await fetch("https://fakestoreapi.com/products");
+        let data = await response.json();
+        let query = textarea.value.toLowerCase();
+
+        // arr to store fetch data titles
+        let arr = data
+          .filter((ele) => ele.title.toLowerCase().includes(query))
+          .map((ele) => ele.title.toUpperCase());
+
+        // one of arg2 in currying func
+        logger("Debounce Search Tiggered");
+
+        setTimeout(() => {
+          if (arr.length > 0) {
+            finalres_para.style.color = "blue";
+            finalres_para.innerHTML = `Results:  HELLO, ${arr.join(",")}`;
+          } else {
+            finalres_para.style.color = "red";
+            finalres_para.innerHTML = "Sorry!! no result found";
+          }
+        }, 1000);
+      }
+
+      let debounceValue = debounce(fetchData, 1000);
+      textarea.addEventListener("keyup", debounceValue);
+
+      // Troattling
+      function throttling(fun, delay) {
+        let lasttimeout = 0;
+        return function () {
+          const now = Date.now();
+          if (now - lasttimeout >= delay) {
+            fun();
+            lasttimeout = now;
+          }
+        };
+      }
+
+      // fun used in throttling
+      function triggeredkeys() {
+        // console.log("Throttled keystroke:", input.value);
+        logger(`Throttled keystroke: ${textarea.value}`);
+      }
+
+      let throttlingVal = throttling(triggeredkeys, 300);
+      textarea.addEventListener("keyup", throttlingVal);
+    </script>
+  </body>
+</html>
